@@ -1,61 +1,117 @@
-# README #
+# Homework 5
 
-This repository is read-only, make a private fork in the bitbucket server
-for your own files. Clone this forked repository to your local computer and solve
-the task.
+This project is configured to work offline using local libraries in the `lib/` directory. All code resides in the default package.
 
-See on viienda kodutöö failide hoidla, mida saab kasutada ainult algseks lugemiseks.
-Töötamiseks looge endale isiklik repositoorium, näiteks privaatne 'fork' bitbucket serverisse, millest saate luua klooni oma arvutisse.
-
-## Command line examples. Näidete kasutamine käsurealt ##
-#### Compilation. Kompileerimine: ####
+## 📂 Project Structure
 
 ```
-#!bash
-
-javac -cp src src/Node.java
+h5/
+├── src/main/java/       # Application source code
+│   └── Node.java
+├── src/test/java/       # Test code
+│   ├── NodeTest.java
+│   └── Aout.java        # Test helper utilities
+├── lib/                 # Local libraries
+│   ├── junit-4.13.2.jar
+│   └── hamcrest-core-1.3.jar
+├── bin/                 # Compiled class files
+└──
 ```
 
-#### Execution. Käivitamine: ####
+## 🛠️ Command Line Instructions
 
-```
-#!bash
+Since the project uses the default package and local JAR files, commands differ by operating system (path separator: Windows `;` vs Linux/Mac `:`).
 
-java -cp src Node
-```
+### Windows (Command Prompt / PowerShell)
 
+```bash
+# 1. Compile main code
+javac -d bin src/main/java/*.java
 
-### Usage of tests. Testide kasutamine ###
-#### Compilation of a test. Testi kompileerimine: ####
+# 2. Compile tests (requires lib folder and main code in bin)
+javac -d bin -cp "lib/*;bin" src/test/java/*.java
 
-```
-#!bash
+# 3. Run application
+java -cp bin Node
 
-javac -encoding utf8 -cp 'src:test:test/junit-4.13.2.jar:test/hamcrest-core-1.3.jar' test/NodeTest.java
-
-```
-In Windows replace colons by semicolons. Sama Windows aknas (koolonite asemel peavad olema semikoolonid):
-
-```
-#!bash
-
-javac -encoding utf8 -cp 'src;test;test/junit-4.13.2.jar;test/hamcrest-core-1.3.jar' test/NodeTest.java
-
-
+# 4. Run JUnit tests
+java -cp "bin;lib/*" org.junit.runner.JUnitCore NodeTest
 ```
 
-#### Running a test. Testi käivitamine: ####
+### Linux and macOS
 
+```bash
+# 1. Compile main code
+javac -d bin src/main/java/*.java
+
+# 2. Compile tests (requires lib folder and main code in bin)
+javac -d bin -cp "lib/*:bin" src/test/java/*.java
+
+# 3. Run application
+java -cp bin Node
+
+# 4. Run JUnit tests
+java -cp "bin:lib/*" org.junit.runner.JUnitCore NodeTest
 ```
-#!bash
 
-java -cp 'src:test:test/junit-4.13.2.jar:test/hamcrest-core-1.3.jar' org.junit.runner.JUnitCore NodeTest
-```
+---
 
-The same for Windows. Sama Windows aknas (koolonite asemel semikoolonid):
+## 📋 Task Description
 
-```
-#!bash
+Write a method to build a tree from the right parenthetic string representation
+ (return the root node of the tree) and a method to construct the left
+ parenthetic string representation of a tree represented by the root node this.
+ Tree is a pointer structure with two pointers to link the nodes of type Node
+ - pointer to the first child and pointer to the next sibling. Build test trees
+ and print the results in the main-method, do not forget to test a tree that
+ consists of one node only. Node name must be non-empty and must not contain
+ round brackets, commas and whitespace symbols. In case of an invalid input
+ string the parsePostfix method must throw a RuntimeException with meaningful
+ error message.
+The names of variables and methods start with a lowercase letter, instance
+ variables are private, additional methods that do not depend on objects are
+ described as class methods (static).
+All exceptions shall have an appropriate and informative error message
+ that provides full context in its original form.
+A string buffer (StringBuilder or StringBuffer) should be used to create
+ textual representations.
+In textual representation, the use of spaces to improve readability is
+ considered permissible (for example, it is natural to use space after comma).
+Is the input error handling of the parsing method exhaustive? Do the error
+ messages reflect both the substantive cause of the error (not the "kitchen side")
+ and the illegal input itself?
+If any sources are used in the solution, they are correctly cited.
+ Do you still understand exactly how the source code works?
+ Are you able to recreate it without any help?
 
-java -cp 'src;test;test/junit-4.13.2.jar;test/hamcrest-core-1.3.jar' org.junit.runner.JUnitCore NodeTest
-```
+public static Node parsePostfix (String s)
+public String leftParentheticRepresentation()
+
+Koostage meetodid puu parempoolse suluesituse (String) järgi puu moodustamiseks
+ (parsePostfix, tulemuseks puu juurtipp) ning etteantud puu vasakpoolse suluesituse
+ leidmiseks stringina (puu juureks on tipp this, meetod leftParentheticRepresentation
+ tulemust ei trüki, ainult tagastab String-tüüpi väärtuse). Testige muuhulgas ka
+ ühetipuline puu. Testpuude moodustamine ja tulemuse väljatrükk olgu peameetodis.
+ Puu kujutamisviisina kasutage viidastruktuuri (viidad "esimene alluv" firstChild
+ ja "parem naaber" nextSibling, tipu tüüp on Node). Tipu nimi ei tohi olla tühi
+ ega sisaldada ümarsulge, komasid ega tühikuid. Kui meetodile parsePostfix etteantav
+ sõne on vigane, siis tuleb tekitada asjakohase veateatega RuntimeException.
+Kontrollige, et:
+1. Muutujate ja meetodite nimed algavad väikese algustähega, isendimuutujad on
+ privaatsed, objektidest mittesõltuvad lisameetodid on kirjeldatud klassimeetoditena (static).
+2. Kõikidel erinditel peab olema asjakohane ja informatiivne veateade.
+3. Suluesituse moodustamiseks tuleks kasutada sõnepuhvrit (StringBuilder või StringBuffer).
+4. Suluesituses lugeda lubatavaks tühikute kasutamine loetavuse parandamiseks
+ (näiteks peale koma on see loomulik).
+5. Kas suluesituse parsimise meetodi sisendi veatöötlus on ammendav?
+ Kas veateadetes peegelduvad nii vea sisuline (mitte köögipoole) põhjus kui ka
+ vigane sisend ise tervikuna?
+6. Kui lahenduses on kasutatud mingeid allikaid, siis need on korrektselt viidatud.
+ Kas te saate ikka täiesti täpselt aru, kuidas allikaks olev (tõenäoliselt ebatäiuslik)
+ kood töötab? Kas olete võimeline seda taaslooma ilma abivahenditeta?
+
+---
+
+## ⚙️ Requirements
+
+- **Java 8** or higher

@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Node",
+            "request": "launch",
+            "mainClass": "Node",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "Käivita App",
+            "request": "launch",
+            "mainClass": "Node",
+            "projectName": "h5"
+        }
+    ]
+}
+
