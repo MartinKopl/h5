@@ -4,8 +4,8 @@ public class Node {
    private Node firstChild;
    private Node nextSibling;
 
-   private static String input;
-   private static int pos;
+   private static String input; // parsitav sõne
+   private static int pos;      // mitmendat märki parajasti loeme
 
    Node (String n, Node d, Node r) {
       name = n;
@@ -13,40 +13,42 @@ public class Node {
       nextSibling = r;
    }
 
+   /** Ehitab puu parempoolsest suluesitusest, nt "(B,C)A", ja tagastab juure. */
    public static Node parsePostfix (String s) {
       input = s;
       pos = 0;
       if (s == null || s.isEmpty()) {
-         error("Input is empty");
+         error("sisend on tühi");
       }
       for (char c : s.toCharArray()) {
          if (Character.isWhitespace(c)) {
-            error("Tree can't contain whitespaces");
+            error("puu ei tohi sisaldada tühikuid");
          }
       }
       Node root = readTree();
       if (pos < s.length()) {
-         error("Tree can have only one root, excessive part starts at " + pos);
+         error("puul saab olla ainult üks juur, liigne osa algab kohalt " + pos);
       }
       return root;
    }
 
+   /** Loeb ühe alampuu: kõigepealt sulgudes lapsed (kui on), siis tipu nimi. */
    private static Node readTree() {
       Node firstChild = null;
 
       if (current() == '(') {
-         pos++;
-         firstChild = readTree();
+         pos++;                         // jätame '(' vahele
+         firstChild = readTree();       // esimene laps
          Node lastChild = firstChild;
          while (current() == ',') {
-            pos++;
+            pos++;                      // jätame ',' vahele
             lastChild.nextSibling = readTree();
             lastChild = lastChild.nextSibling;
          }
          if (current() != ')') {
-            error("At " + pos + " was expected ',' or ')'");
+            error("kohal " + pos + " oodati ',' või ')'");
          }
-         pos++;
+         pos++;                         // jätame ')' vahele
       }
 
       int start = pos;
@@ -54,12 +56,13 @@ public class Node {
          pos++;
       }
       if (start == pos) {
-         error("At " + pos + " name of top is missing");
+         error("kohal " + pos + " puudub tipu nimi");
       }
       String name = input.substring(start, pos);
       return new Node(name, firstChild, null);
    }
 
+   /** Jooksev märk või 0, kui sõne on läbi. */
    private static char current() {
       if (pos < input.length()) {
          return input.charAt(pos);
@@ -68,23 +71,30 @@ public class Node {
    }
 
    private static void error (String reason) {
-      throw new RuntimeException("Wrong tree \"" + input + "\": " + reason);
+      throw new RuntimeException("Vigane puu \"" + input + "\": " + reason);
    }
 
+   /** Tagastab vasakpoolse suluesituse, nt "A(B,C)". */
    public String leftParentheticRepresentation() {
-      StringBuilder sb = new StringBuilder(name);
+      StringBuilder sb = new StringBuilder(); // üks puhver kogu puu jaoks
+      appendTo(sb);
+      return sb.toString();
+   }
+
+   /** Kirjutab selle tipu ja tema alampuu etteantud puhvrisse. */
+   private void appendTo (StringBuilder sb) {
+      sb.append(name);
       if (firstChild != null) {
          sb.append('(');
-         sb.append(firstChild.leftParentheticRepresentation());
+         firstChild.appendTo(sb);
          Node child = firstChild.nextSibling;
          while (child != null) {
             sb.append(',');
-            sb.append(child.leftParentheticRepresentation());
+            child.appendTo(sb);
             child = child.nextSibling;
          }
          sb.append(')');
       }
-      return sb.toString();
    }
 
    public static void main (String[] param) {
