@@ -4,8 +4,8 @@ public class Node {
    private Node firstChild;
    private Node nextSibling;
 
-   private static String input; // parsitav sõne
-   private static int pos;      // mitmendat märki parajasti loeme
+   private static String input; // string being parsed
+   private static int pos;      // index of the current character
 
    Node (String n, Node d, Node r) {
       name = n;
@@ -13,7 +13,7 @@ public class Node {
       nextSibling = r;
    }
 
-   /** Ehitab puu parempoolsest suluesitusest, nt "(B,C)A", ja tagastab juure. */
+   /** Builds a tree from its right parenthetic representation, e.g. "(B,C)A", and returns the root. */
    public static Node parsePostfix (String s) {
       input = s;
       pos = 0;
@@ -32,23 +32,23 @@ public class Node {
       return root;
    }
 
-   /** Loeb ühe alampuu: kõigepealt sulgudes lapsed (kui on), siis tipu nimi. */
+   /** Reads one subtree: first the children in brackets (if any), then the node name. */
    private static Node readTree() {
       Node firstChild = null;
 
       if (current() == '(') {
-         pos++;                         // jätame '(' vahele
-         firstChild = readTree();       // esimene laps
+         pos++;                         // skip '('
+         firstChild = readTree();       // first child
          Node lastChild = firstChild;
          while (current() == ',') {
-            pos++;                      // jätame ',' vahele
+            pos++;                      // skip ','
             lastChild.nextSibling = readTree();
             lastChild = lastChild.nextSibling;
          }
          if (current() != ')') {
             error("kohal " + pos + " oodati ',' või ')'");
          }
-         pos++;                         // jätame ')' vahele
+         pos++;                         // skip ')'
       }
 
       int start = pos;
@@ -62,7 +62,7 @@ public class Node {
       return new Node(name, firstChild, null);
    }
 
-   /** Jooksev märk või 0, kui sõne on läbi. */
+   /** Returns the current character, or 0 at the end of the string. */
    private static char current() {
       if (pos < input.length()) {
          return input.charAt(pos);
@@ -74,14 +74,14 @@ public class Node {
       throw new RuntimeException("Vigane puu \"" + input + "\": " + reason);
    }
 
-   /** Tagastab vasakpoolse suluesituse, nt "A(B,C)". */
+   /** Returns the left parenthetic representation, e.g. "A(B,C)". */
    public String leftParentheticRepresentation() {
-      StringBuilder sb = new StringBuilder(); // üks puhver kogu puu jaoks
+      StringBuilder sb = new StringBuilder(); // one buffer for the whole tree
       appendTo(sb);
       return sb.toString();
    }
 
-   /** Kirjutab selle tipu ja tema alampuu etteantud puhvrisse. */
+   /** Appends this node and its subtree to the given buffer. */
    private void appendTo (StringBuilder sb) {
       sb.append(name);
       if (firstChild != null) {
