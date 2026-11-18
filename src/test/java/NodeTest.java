@@ -8,7 +8,7 @@ import org.junit.Test;
 public class NodeTest {
 
    @Test (timeout=1000)
-   public void testParsePostfix() { 
+   public void testParsePostfix() {
       String s = "(B1,C,D)A";
       Node t = Node.parsePostfix (s);
       String r = t.leftParentheticRepresentation();
@@ -44,7 +44,7 @@ public class NodeTest {
       s = "((1,(2)3,4)5)6";
       t = Node.parsePostfix (s);
       r = t.leftParentheticRepresentation();
-       assertEquals ("Tree: " + s, "6(5(1,3(2),4))", r);
+      assertEquals ("Tree: " + s, "6(5(1,3(2),4))", r);
    }
 
    @Test (timeout=1000)
@@ -57,7 +57,7 @@ public class NodeTest {
       t = new Node (s, null, null);
       r = t.leftParentheticRepresentation();
       assertEquals ("Single node" + s, s, r);
-   } 
+   }
 
    @Test (timeout=1000)
    public void testMore() {
@@ -142,5 +142,68 @@ public class NodeTest {
       Node root = Node.parsePostfix ("((A)B,(C)D)");
    }
 
-}
+   // ---------- toXML tests ----------
 
+   /** Removes all whitespace, so only the tags and names are compared. */
+   private static String noSpaces (String s) {
+      return s.replaceAll("\\s+", "");
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLExampleExact() {
+      String s = "((C)B,(E,F)D,G)A";
+      String expected =
+              "<L1> A\n" +
+                      "    <L2> B\n" +
+                      "        <L3> C </L3>\n" +
+                      "    </L2>\n" +
+                      "    <L2> D\n" +
+                      "        <L3> E </L3>\n" +
+                      "        <L3> F </L3>\n" +
+                      "    </L2>\n" +
+                      "    <L2> G </L2>\n" +
+                      "</L1>";
+      assertEquals ("Tree: " + s, expected, Node.parsePostfix (s).toXML());
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLSingleNode() {
+      String s = "A";
+      assertEquals ("Tree: " + s, "<L1>A</L1>",
+              noSpaces (Node.parsePostfix (s).toXML()));
+      Node t = new Node (".Y.", null, null);
+      assertEquals ("Single node .Y.", "<L1>.Y.</L1>", noSpaces (t.toXML()));
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLChain() {
+      String s = "((((E)D)C)B)A";
+      assertEquals ("Tree: " + s,
+              "<L1>A<L2>B<L3>C<L4>D<L5>E</L5></L4></L3></L2></L1>",
+              noSpaces (Node.parsePostfix (s).toXML()));
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLManyChildren() {
+      String s = "(B,C,D,E,F)A";
+      assertEquals ("Tree: " + s,
+              "<L1>A<L2>B</L2><L2>C</L2><L2>D</L2><L2>E</L2><L2>F</L2></L1>",
+              noSpaces (Node.parsePostfix (s).toXML()));
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLMixed() {
+      String s = "((C,(E)D)B,F)A";
+      assertEquals ("Tree: " + s,
+              "<L1>A<L2>B<L3>C</L3><L3>D<L4>E</L4></L3></L2><L2>F</L2></L1>",
+              noSpaces (Node.parsePostfix (s).toXML()));
+   }
+
+   @Test (timeout=1000)
+   public void testToXMLDoesNotChangeTree() {
+      String s = "((A)B,(C)D)E";
+      Node t = Node.parsePostfix (s);
+      t.toXML();
+      assertEquals ("Tree: " + s, "E(B(A),D(C))", t.leftParentheticRepresentation());
+   }
+}

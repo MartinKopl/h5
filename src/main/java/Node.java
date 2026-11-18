@@ -97,7 +97,49 @@ public class Node {
       }
    }
 
+   /** Returns the tree as pseudo-XML, where <Lk> marks a node at depth k. */
+   public String toXML() {
+      StringBuilder sb = new StringBuilder(); // one buffer for the whole tree
+      appendXML(sb, 1);
+      return sb.toString();
+   }
+
+   /** Appends this node (at the given depth) and its subtree as pseudo-XML. */
+   private void appendXML (StringBuilder sb, int depth) {
+      if (depth > 1) {
+         sb.append('\n');                    // every node except the root starts on a new line
+      }
+      appendIndent(sb, depth);
+      sb.append("<L").append(depth).append("> ").append(name);
+
+      if (firstChild == null) {             // leaf: closing tag on the same line
+         sb.append(" </L").append(depth).append('>');
+         return;
+      }
+
+      Node child = firstChild;
+      while (child != null) {
+         child.appendXML(sb, depth + 1);
+         child = child.nextSibling;
+      }
+      sb.append('\n');
+      appendIndent(sb, depth);
+      sb.append("</L").append(depth).append('>');
+   }
+
+   /** Appends 4 spaces for every level below the root. */
+   private static void appendIndent (StringBuilder sb, int depth) {
+      for (int i = 1; i < depth; i++) {
+         sb.append("    ");
+      }
+   }
+
    public static void main (String[] param) {
+      String xmlExample = "((C)B,(E,F)D,G)A";
+      System.out.println(xmlExample + " ==>");
+      System.out.println(Node.parsePostfix(xmlExample).toXML());
+      System.out.println(Node.parsePostfix("A").toXML());
+
       String[] trees = { "(B1,C)A", "A", "((C,(E)D)B,F)A", "(((2,1)-,4)*,(69,3)/)+" };
       for (String s : trees) {
          Node t = Node.parsePostfix(s);
